@@ -19,6 +19,7 @@ import net.sourceforge.vrapper.vim.modes.BlockwiseVisualMode;
 import net.sourceforge.vrapper.vim.modes.NormalMode;
 import net.sourceforge.vrapper.vim.register.DefaultRegisterManager;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -305,6 +306,30 @@ public class BlockwiseVisualModeTests extends CommandTestCase {
 			    "Sta", 'e', "dit a block\n"
 			  + "Theeditnd select it\n"
 			  + "Finedit that.");
+	}
+
+    /**
+     * TODO test block including end of line?
+     * 
+     * java.lang.RuntimeException: Line is out of range
+     * at net.sourceforge.vrapper.core.tests.utils.TestTextContent.getLineInformation(TestTextContent.java:27)
+     */
+	@Test @Ignore
+	public void test_c2() {
+        prepareEditor(false, block(
+                        "Start by making a b", "lock", "",
+                        "Which spans the EOL", "", "",
+                        "of a shorter line i", "n the middle", "",
+                        "Finally stop at tha", "t.", ""));
+        String initial = content.getText();
+        executeCommand(forKeySeq("cedit<ESC>"));
+        assertEquals(NormalMode.NAME, adaptor.getCurrentModeName());
+        // [FIXME] Cursor position should be on 't'
+        assertCommandResult(initial,
+                        "Start by making a b", 'e', "dit\n"
+                                        + "Which spans the EOLedit\n"
+                                        + "of a shorter line iedit\n"
+                                        + "Finally stop at thaedit");
 	}
 
 	@Test
