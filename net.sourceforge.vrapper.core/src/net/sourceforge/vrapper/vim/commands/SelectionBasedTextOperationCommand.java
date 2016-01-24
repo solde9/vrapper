@@ -109,9 +109,12 @@ public class SelectionBasedTextOperationCommand extends CountAwareCommand {
             }
             final int endLine = Math.min(block.endLine, textContent.getNumberOfLines() - 1);
             for (int line = block.startLine + 1; line <= endLine; ++line) {
-                final Position runStart = cursorService.getPositionByVisualOffset(line, block.startVisualOffset);
+                Position runStart = cursorService.getPositionByVisualOffset(line, block.startVisualOffset);
                 Position runEnd = cursorService.getPositionByVisualOffset(line, block.endVisualOffset);
                 final LineInformation lineInfo = textContent.getLineInformation(line);
+                if (runStart == null) {
+                   runStart = cursorService.newPositionForModelOffset(lineInfo.getEndOffset()); 
+                }
                 if (runEnd == null || lineInfo.getLength() == 0) {
                     runEnd = cursorService.newPositionForModelOffset(lineInfo.getEndOffset());
                 } else {
@@ -197,7 +200,7 @@ public class SelectionBasedTextOperationCommand extends CountAwareCommand {
         final LineInformation lineInfo = textContent.getLineInformation(textBlock.startLine);
         if (runStart == null) {
             // Empty line?
-            runStart = cursorService.newPositionForModelOffset(lineInfo.getBeginOffset());
+            runStart = cursorService.newPositionForModelOffset(lineInfo.getEndOffset());
         }
         Position runEnd = cursorService.getPositionByVisualOffset(textBlock.startLine, textBlock.endVisualOffset);
         if (runEnd == null) {
